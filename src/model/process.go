@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 	"starlabs-twitter/src/utils"
+	"strings"
 	"time"
 
 	"github.com/0xStarLabs/TwitterAPI/client"
@@ -32,7 +33,11 @@ func ProcessAccount(accountIndex int, account utils.Account, userSelectedOptions
 	twitter, err := initTwitterClient(account, config)
 	if err != nil {
 		logger.Error("Failed to initialize Twitter client: %v", err)
-		utils.UpdateAccountStatus(utils.AccountsFilePath, account, "UNKNOWN")
+		if strings.Contains(err.Error(), "locked") {
+			utils.UpdateAccountStatus(utils.AccountsFilePath, account, "LOCKED")
+		} else {
+			utils.UpdateAccountStatus(utils.AccountsFilePath, account, "UNKNOWN")
+		}
 		stats.IncrementFailed()
 		return
 	}
@@ -125,7 +130,7 @@ func ProcessAccount(accountIndex int, account utils.Account, userSelectedOptions
 				for _, link := range taskData.QuoteTweetLinks {
 					logger.Info("Attempting to quote tweet with picture %s", link)
 					resp := twitter.Tweet(fileData.Tweets[accountIndex-1], &client.TweetOptions{
-						MediaBase64: fileData.Pictures[accountIndex-1],
+						MediaBase64:   fileData.Pictures[accountIndex-1],
 						QuoteTweetURL: link,
 					})
 					success = resp.Success
