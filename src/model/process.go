@@ -35,6 +35,8 @@ func ProcessAccount(accountIndex int, account utils.Account, userSelectedOptions
 		logger.Error("Failed to initialize Twitter client: %v", err)
 		if strings.Contains(err.Error(), "locked") {
 			utils.UpdateAccountStatus(utils.AccountsFilePath, account, "LOCKED")
+		} else if strings.Contains(err.Error(), "invalid token") {
+			utils.UpdateAccountStatus(utils.AccountsFilePath, account, "INVALID_TOKEN")
 		} else {
 			utils.UpdateAccountStatus(utils.AccountsFilePath, account, "UNKNOWN")
 		}
@@ -219,6 +221,7 @@ func handleTwitterError(logger utils.Logger, resp TwitterResponse) string {
 		return "AUTH_ERROR"
 	case StatusLocked:
 		return "LOCKED"
+
 	default:
 		logger.Error("Unknown error: %v", resp.Error)
 		return "UNKNOWN"
