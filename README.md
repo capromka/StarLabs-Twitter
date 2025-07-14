@@ -1,4 +1,4 @@
-# Twitter Bot 2.0.0 🚀
+# Twitter Bot 2.0.0 
 
 A powerful and flexible Twitter automation tool with multiple features and parallel processing capabilities.
 
